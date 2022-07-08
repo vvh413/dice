@@ -1,10 +1,10 @@
+use mouse_rs::types::Point;
+use mouse_rs::Mouse;
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
+use regex::Regex;
 use std::env;
 use std::io::{stdout, Write};
-use regex::Regex;
-use rand::{SeedableRng, Rng};
-use rand::rngs::StdRng;
-use mouse_rs::Mouse;
-use mouse_rs::types::Point;
 
 const RANDOM_POOL_SIZE: usize = 1000;
 const MOVE_DELTA: i32 = 100;
@@ -50,16 +50,14 @@ fn get_seed() -> [u8; 32] {
     }
     println!();
     let mut rng = StdRng::from_entropy();
-    let idx = rng.gen_range(0..RANDOM_POOL_SIZE-32);
-    pool[idx..idx+32].try_into().unwrap()
+    let idx = rng.gen_range(0..RANDOM_POOL_SIZE - 32);
+    pool[idx..idx + 32].try_into().unwrap()
 }
 
 fn randomize(x: i32, y: i32, seed: [u8; 32]) -> Vec<i32> {
     let mut rng = StdRng::from_seed(seed);
 
-    {0..x}.map(|_| {
-        rng.gen_range(1..=y)
-    }).collect()
+    { 0..x }.map(|_| rng.gen_range(1..=y)).collect()
 }
 
 fn distance(p1: &Point, p2: &Point) -> i32 {
