@@ -6,7 +6,7 @@ use regex::Regex;
 use std::env;
 use std::io::{stdout, Write};
 
-const RANDOM_POOL_SIZE: usize = 1000;
+const RANDOM_POOL_SIZE: usize = 200;
 const MOVE_DELTA: i32 = 100;
 
 fn main() {
@@ -26,7 +26,7 @@ fn main() {
     let seed: [u8; 32] = get_seed();
     let results = randomize(x, y, seed);
     let sum: i32 = results.iter().sum();
-    println!("{:} = {:?} = {:}", dice, results, sum);
+    println!("\r{:} = {:?} = {:}      ", dice, results, sum);
 }
 
 fn help() {
@@ -38,17 +38,20 @@ fn get_seed() -> [u8; 32] {
     let mouse = Mouse::new();
     let mut pool: Vec<u8> = Vec::new();
     let mut curr_pos = mouse.get_position().unwrap();
+    let loading_symbol_dimension = 100 as f64 / (RANDOM_POOL_SIZE as f64);
+
     while pool.len() < RANDOM_POOL_SIZE {
         let pos = mouse.get_position().unwrap();
         if distance(&pos, &curr_pos) > MOVE_DELTA {
-            let value = (pos.x ^ pos.y).to_ne_bytes();
+            let mut value = (pos.x ^ pos.y).to_ne_bytes();
             pool.extend(value);
             curr_pos = pos;
-            print!("{:x}", i32::from_ne_bytes(value));
+            let loading_symbols_count = pool.len() as f64 * loading_symbol_dimension;
+            print!("\rdrag cursor: {:}%", loading_symbols_count as i32);
             stdout().flush().unwrap();
         }
     }
-    println!();
+    // println!();
     let mut rng = StdRng::from_entropy();
     let idx = rng.gen_range(0..RANDOM_POOL_SIZE - 32);
     pool[idx..idx + 32].try_into().unwrap()
