@@ -5,6 +5,7 @@ use rand::{Rng, SeedableRng};
 use regex::Regex;
 use std::env;
 use std::io::{stdout, Write};
+use term_size;
 
 const RANDOM_POOL_SIZE: usize = 200;
 const MOVE_DELTA: i32 = 100;
@@ -26,7 +27,7 @@ fn main() {
     let seed: [u8; 32] = get_seed();
     let results = randomize(x, y, seed);
     let sum: i32 = results.iter().sum();
-    println!("\r{:} = {:?} = {:}      ", dice, results, sum);
+    println!("Result: {:} = {:?} = {:}", dice, results, sum);
 }
 
 fn help() {
@@ -35,11 +36,13 @@ fn help() {
 }
 
 fn get_seed() -> [u8; 32] {
+    let (terminal_width, _) = term_size::dimensions().unwrap();
     let mouse = Mouse::new();
     let mut pool: Vec<u8> = Vec::new();
     let mut curr_pos = mouse.get_position().unwrap();
-    let loading_symbol_dimension = 100 as f64 / (RANDOM_POOL_SIZE as f64);
-    print!("\rDrag cursor: 0%");
+    let loading_percent_dimension = 100 as f64 / (RANDOM_POOL_SIZE as f64);
+    let loading_symbol_dimension = (terminal_width - 20) as f64 / (RANDOM_POOL_SIZE as f64);
+    print!("\rDrag cursor: [0%]");
     stdout().flush().unwrap();
     while pool.len() < RANDOM_POOL_SIZE {
         let pos = mouse.get_position().unwrap();
@@ -47,8 +50,9 @@ fn get_seed() -> [u8; 32] {
             let mut value = (pos.x ^ pos.y).to_ne_bytes();
             pool.extend(value);
             curr_pos = pos;
-            let loading_symbols_count = pool.len() as f64 * loading_symbol_dimension;
-            print!("\rDrag cursor: {:}%", loading_symbols_count as i32);
+            let loading_percent = pool.len() as f64 * loading_percent_dimension;
+            let loading_symbol_count = pool.len() as f64 * loading_symbol_dimension;
+            print!("\rDrag cursor: [{:}%] {:}", loading_percent as i32, "#".repeat(loading_symbol_count as usize));
             stdout().flush().unwrap();
         }
     }
