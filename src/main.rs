@@ -39,7 +39,8 @@ fn get_seed() -> [u8; 32] {
     let mut pool: Vec<u8> = Vec::new();
     let mut curr_pos = mouse.get_position().unwrap();
     let loading_symbol_dimension = 100 as f64 / (RANDOM_POOL_SIZE as f64);
-
+    print!("\rDrag cursor: 0%");
+    stdout().flush().unwrap();
     while pool.len() < RANDOM_POOL_SIZE {
         let pos = mouse.get_position().unwrap();
         if distance(&pos, &curr_pos) > MOVE_DELTA {
@@ -47,7 +48,7 @@ fn get_seed() -> [u8; 32] {
             pool.extend(value);
             curr_pos = pos;
             let loading_symbols_count = pool.len() as f64 * loading_symbol_dimension;
-            print!("\rdrag cursor: {:}%", loading_symbols_count as i32);
+            print!("\rDrag cursor: {:}%", loading_symbols_count as i32);
             stdout().flush().unwrap();
         }
     }
