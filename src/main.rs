@@ -18,7 +18,8 @@ fn main() {
     let params: Vec<&str> = dice.split('d').collect();
     let x: u32 = params[0].to_string().parse::<u32>().unwrap();
     let y: u32 = params[1].to_string().parse::<u32>().unwrap();
-    let seed: [u8; 32] = random::get_seed();
+
+    let seed: u64 = random::get_seed();
     let results = random::randomize(x, y, seed);
     let sum: u32 = results.iter().sum();
     println!("{:} = {:?} = {:}", dice, results, sum);

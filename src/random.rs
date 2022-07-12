@@ -1,39 +1,56 @@
 use crate::progress::bar;
-use mouse_rs::types::Point;
-use mouse_rs::Mouse;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use term_size;
+use winit::platform::run_return::EventLoopExtRunReturn;
+use winit::{
+    event::{DeviceEvent, Event},
+    event_loop::{ControlFlow, EventLoop},
+};
 
-const RANDOM_POOL_SIZE: usize = 1000;
-const MOVE_DELTA: i32 = 100;
+const MOUSE_TICK_COUNT: usize = 5000;
+const MOUSE_TICK_DELTA: usize = 100;
 
-pub fn get_seed() -> [u8; 32] {
-    let (terminal_width, _) = term_size::dimensions().unwrap();
-    let mouse = Mouse::new();
-    let mut pool: Vec<u8> = Vec::new();
-    let mut curr_pos = mouse.get_position().unwrap();
-    bar(pool.len(), RANDOM_POOL_SIZE, terminal_width);
-    while pool.len() < RANDOM_POOL_SIZE {
-        let pos = mouse.get_position().unwrap();
-        if distance(&pos, &curr_pos) > MOVE_DELTA {
-            let value = (pos.x ^ pos.y).to_ne_bytes();
-            pool.extend(value);
-            curr_pos = pos;
-            bar(pool.len(), RANDOM_POOL_SIZE, terminal_width);
-        }
-    }
-    println!();
-    let mut rng = StdRng::from_entropy();
-    let idx = rng.gen_range(0..RANDOM_POOL_SIZE - 32);
-    pool[idx..idx + 32].try_into().unwrap()
-}
-
-pub fn randomize(x: u32, y: u32, seed: [u8; 32]) -> Vec<u32> {
-    let mut rng = StdRng::from_seed(seed);
+pub fn randomize(x: u32, y: u32, seed: u64) -> Vec<u32> {
+    let mut rng = StdRng::seed_from_u64(seed);
     { 0..x }.map(|_| rng.gen_range(1..=y)).collect()
 }
 
-fn distance(p1: &Point, p2: &Point) -> i32 {
-    (p1.x - p2.x).abs() + (p1.y - p2.y).abs()
+pub fn get_seed() -> u64 {
+    let mut event_loop = EventLoop::new();
+    let mut seed: u64 = 0;
+    let mut tick_counter: usize = 0;
+    let mut delta_accum: (f64, f64) = (0., 0.);
+
+    let (terminal_width, _) = term_size::dimensions().unwrap();
+    bar(tick_counter, MOUSE_TICK_COUNT, terminal_width);
+
+    event_loop.run_return(|event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
+
+        match event {
+            Event::DeviceEvent {
+                event: DeviceEvent::MouseMotion { delta },
+                ..
+            } => {
+                delta_accum = add(delta_accum, delta);
+                tick_counter += 1;
+                if tick_counter % MOUSE_TICK_DELTA == 0 {
+                    seed ^= (delta_accum.0 / delta_accum.1).to_bits();
+                    delta_accum = (0., 0.);
+                }
+                bar(tick_counter, MOUSE_TICK_COUNT, terminal_width);
+
+                if tick_counter == MOUSE_TICK_COUNT {
+                    *control_flow = ControlFlow::Exit;
+                }
+            }
+            _ => (),
+        }
+    });
+    seed
+}
+
+fn add(delta1: (f64, f64), delta2: (f64, f64)) -> (f64, f64) {
+    (delta1.0 + delta2.0, delta1.1 + delta2.1)
 }
