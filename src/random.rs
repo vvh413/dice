@@ -1,4 +1,4 @@
-use crate::progress::bar;
+use crate::progress::Bar;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use term_size;
@@ -23,7 +23,8 @@ pub fn get_seed() -> u64 {
     let mut delta_accum: (f64, f64) = (0., 0.);
 
     let (terminal_width, _) = term_size::dimensions().unwrap();
-    bar(tick_counter, MOUSE_TICK_COUNT, terminal_width);
+
+    let mut bar = Bar::new(MOUSE_TICK_COUNT, terminal_width);
 
     event_loop.run_return(|event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
@@ -39,7 +40,7 @@ pub fn get_seed() -> u64 {
                     seed ^= (delta_accum.0 / delta_accum.1).to_bits();
                     delta_accum = (0., 0.);
                 }
-                bar(tick_counter, MOUSE_TICK_COUNT, terminal_width);
+                bar.inc();
 
                 if tick_counter == MOUSE_TICK_COUNT {
                     *control_flow = ControlFlow::Exit;
