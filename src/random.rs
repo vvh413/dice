@@ -16,6 +16,8 @@ pub fn randomize(x: u32, y: u32, seed: u64) -> Vec<u32> {
     { 0..x }.map(|_| rng.gen_range(1..=y)).collect()
 }
 
+// pub async fn mouse_capture() {}
+
 pub fn get_seed() -> u64 {
     let mut event_loop = EventLoop::new();
     let mut seed: u64 = 0;
