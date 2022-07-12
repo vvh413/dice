@@ -8,7 +8,7 @@ use winit::{
     event_loop::{ControlFlow, EventLoop},
 };
 
-const MOUSE_TICK_COUNT: usize = 5000;
+const MOUSE_TICK_COUNT: usize = 1000;
 const MOUSE_TICK_DELTA: usize = 100;
 
 pub fn randomize(x: u32, y: u32, seed: u64) -> Vec<u32> {
