@@ -1,15 +1,23 @@
 use std::io::{stdout, Write};
 
-const OTHER_CHARS_COUNT: usize = 9;
+use crate::constants::{OTHER_CHARS_COUNT, MOUSE_TICK_DELTA};
 
 pub struct Bar {
-    current: usize,
+    pub current: usize,
     total: usize,
     width: usize,
 }
 
 impl Bar {
-    pub fn new(total: usize, width: usize) -> Self {
+    pub const fn default() -> Self {
+        Bar {
+            current: 0,
+            total: 0,
+            width: 0,
+        }
+    }
+    pub fn new(total: usize) -> Self {
+        let (width, _) = term_size::dimensions().unwrap();
         let bar = Bar {
             current: 0,
             total,
@@ -22,6 +30,14 @@ impl Bar {
     pub fn inc(&mut self) {
         self.current += 1;
         self.draw();
+    }
+
+    pub fn step_complite(&self) -> bool {
+        self.current % MOUSE_TICK_DELTA == 0
+    }
+
+    pub fn complete(&self) -> bool {
+        self.current == self.total
     }
 
     fn draw(&self) {
