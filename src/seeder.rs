@@ -53,7 +53,7 @@ async fn multiply_delta() {
             let delta = DELTA_BUFFER.pop().unwrap();
             delta_accum = add(delta_accum, delta);
                     
-            if BAR.step_complite() {
+            if BAR.step_complete() {
                 if mat.set(delta_accum) {
                     let mult = mat.mult();
                     let vec = transform(mult);

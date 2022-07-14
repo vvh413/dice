@@ -32,7 +32,7 @@ impl Bar {
         self.draw();
     }
 
-    pub fn step_complite(&self) -> bool {
+    pub fn step_complete(&self) -> bool {
         self.current % MOUSE_TICK_DELTA == 0
     }
 
