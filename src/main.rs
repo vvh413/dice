@@ -1,7 +1,4 @@
-use crate::constants::MOUSE_TICK_COUNT;
-use crate::progress::Bar;
-use crate::seeder::{get_seed, BAR, SEED};
-
+use crate::seeder::get_seed;
 use regex::Regex;
 use std::env;
 
@@ -22,13 +19,9 @@ async fn main() {
     let dice = args[1].as_str();
     let (x, y) = parse_dice(dice);
 
-    unsafe {
-        BAR = Bar::new(MOUSE_TICK_COUNT);
-    }
+    let seed = get_seed().await;
 
-    get_seed().await;
-
-    let results = unsafe { random::randomize(x, y, SEED) };
+    let results = random::randomize(x, y, seed);
     let sum: u32 = results.iter().sum();
     println!("{:} = {:?} = {:}", dice, results, sum);
 }

@@ -1,7 +1,8 @@
 use std::io::{stdout, Write};
 
-use crate::constants::{OTHER_CHARS_COUNT, MOUSE_TICK_DELTA};
+use crate::constants::{MOUSE_TICK_DELTA, OTHER_CHARS_COUNT};
 
+#[derive(Clone)]
 pub struct Bar {
     pub current: usize,
     total: usize,
@@ -9,13 +10,6 @@ pub struct Bar {
 }
 
 impl Bar {
-    pub const fn default() -> Self {
-        Bar {
-            current: 0,
-            total: 0,
-            width: 0,
-        }
-    }
     pub fn new(total: usize) -> Self {
         let (width, _) = term_size::dimensions().unwrap();
         let bar = Bar {
