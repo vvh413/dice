@@ -2,7 +2,6 @@ use std::io::{stdout, Write};
 
 use crate::constants::{MOUSE_TICK_DELTA, OTHER_CHARS_COUNT};
 
-#[derive(Clone)]
 pub struct Bar {
     pub current: usize,
     total: usize,
