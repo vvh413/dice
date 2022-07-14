@@ -27,9 +27,6 @@ async fn main() {
     }
 
     get_seed().await;
-    unsafe {
-        println!("SEED = {:?}", SEED);
-    }
 
     let results = unsafe { random::randomize(x, y, SEED) };
     let sum: u32 = results.iter().sum();

@@ -54,12 +54,9 @@ async fn multiply_delta() {
             delta_accum = add(delta_accum, delta);
                     
             if BAR.step_complite() {
-                println!("delta_accum = {:?}", delta_accum);
                 if mat.set(delta_accum) {
                     let mult = mat.mult();
-                    println!("mult = {:?}", mult);
                     let vec = transform(mult);
-                    println!("vec = {:?}", vec);
                     SEED_BUFFER.push(vec);
                     mat.reset();
                 }
@@ -78,7 +75,6 @@ async fn compute_seed() {
             }
             let mut seed_value = SEED_BUFFER.pop().unwrap();
             seed_value.shuffle(&mut rng);
-            println!("seed_value = {:?}", seed_value);
             SEED = vec_xor(SEED, seed_value);
         }
     }
